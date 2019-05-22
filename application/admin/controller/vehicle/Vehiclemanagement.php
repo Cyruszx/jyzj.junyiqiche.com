@@ -224,12 +224,11 @@ class Vehiclemanagement extends Backend
             $total = $this->model
                 ->with(['orderdetails', 'admin', 'service'])
                 ->where($where)
-
                 ->where(function ($query) use ($authId) {
                     //超级管理员
-                    if ($this->auth->rule_message == 'message10')  $query->where(['service_id' => $authId]);
+                    if ($this->auth->rule_message == 'message10') $query->where(['service_id' => $authId]);
 
-                    if($this->auth->rule_message == 'message6') $query->where(['sales_id' => $authId]);
+                    if ($this->auth->rule_message == 'message6') $query->where(['sales_id' => $authId]);
 
                 })
                 ->order($sort, $order)
@@ -238,12 +237,11 @@ class Vehiclemanagement extends Backend
             $list = $this->model
                 ->with(['orderdetails', 'admin', 'service'])
                 ->where($where)
-
                 ->where(function ($query) use ($authId) {
                     //超级管理员
-                    if ($this->auth->rule_message == 'message10')  $query->where(['service_id' => $authId]);
+                    if ($this->auth->rule_message == 'message10') $query->where(['service_id' => $authId]);
 
-                    if($this->auth->rule_message == 'message6') $query->where(['sales_id' => $authId]);
+                    if ($this->auth->rule_message == 'message6') $query->where(['sales_id' => $authId]);
 
                 })
                 ->order($sort, $order)
@@ -395,8 +393,15 @@ class Vehiclemanagement extends Backend
                         $validate = is_bool($this->modelValidate) ? ($this->modelSceneValidate ? $name . '.edit' : $name) : $this->modelValidate;
                         $row->validate($validate);
                     }
+
                     $order_details = new OrderDetails();
-                    $order_details->allowField(true)->save($params);
+                    $exists = $order_details->getByOrder_id($ids);
+                    if ($exists) {
+                        $order_details->allowField(true)->save($params,['id'=>$exists->id]);
+                    } else {
+                        $order_details->allowField(true)->save($params);
+                    }
+
 
                     $data[] = [
                         'hphm' => mb_substr($params['licensenumber'], 0, 2),
@@ -597,6 +602,7 @@ class Vehiclemanagement extends Backend
     {
         return ['12' => __('12'), '24' => __('24'), '36' => __('36'), '48' => __('48'), '60' => __('60')];
     }
+
     /**
      * 获取违章信息(单个、批量)
      * @throws \think\Exception
@@ -1228,7 +1234,7 @@ class Vehiclemanagement extends Backend
             $value['createtime'] = $value['createtime'] ? date('Y-m-d', $value['createtime']) : '';
 
             $value['orderdetails']['update_violation_time'] = $value['orderdetails']['update_violation_time'] ? date('Y-m-d', $value['orderdetails']['update_violation_time']) : '';
-            $value['orderdetails']['annual_inspection_time'] = is_numeric($value['orderdetails']['annual_inspection_time'])? date('Y-m-d', $value['orderdetails']['annual_inspection_time']) : $value['orderdetails']['annual_inspection_time'];
+            $value['orderdetails']['annual_inspection_time'] = is_numeric($value['orderdetails']['annual_inspection_time']) ? date('Y-m-d', $value['orderdetails']['annual_inspection_time']) : $value['orderdetails']['annual_inspection_time'];
             $value['orderdetails']['traffic_force_insurance_time'] = $value['orderdetails']['traffic_force_insurance_time'] ? date('Y-m-d', $value['orderdetails']['traffic_force_insurance_time']) : '';
 
             switch ($value['orderdetails']['is_it_illegal']) {
@@ -1862,7 +1868,7 @@ class Vehiclemanagement extends Backend
             } else {
 
                 $this->error();
-              
+
             }
 
         }
